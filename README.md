@@ -8,12 +8,11 @@ https://hexcolor-randomizer.netlify.app/
 
 ## Screen Shots
 
-![Game Example](1.png)
+![Game Example](1.gif)
 
 ## Technologies Used
 
 * React
-* Node.js
-* npm
-* Yarn
-* JavaScript ES6, HTML, and CSS
+* JavaScript 
+* HTML
+* CSS
