@@ -4,7 +4,7 @@
 An aesthetic web application that generates random three-byte hexadecimal numbers for building web color pallets using React.js.
 
 ## Go to the Website
-https://hexcolor-randomizer.netlify.app/
+https://randomhex-color.netlify.app/
 
 ## Screen Shots
 
