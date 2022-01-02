@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import "./App.css";
 
 const App = () => {
-  const [hexColor, setHexColor] = useState("CLICK HERE");
-  const [textColor, setTextColor] = useState("isLight");
-  const [textContent, setTextContent] = useState("Press space to copy");
   const [colorPallete, setColorPallete] = useState([]);
+  const [hexColor, setHexColor] = useState("CLICK HERE");
+  const [hexTextColor, setTextColor] = useState("light");
+  const [showColorAdded, setShowColorAdded] = useState(false);
+  const [showColorPallete, setShowColorPallete] = useState(false);
+  const [textContent, setTextContent] = useState("Press space to copy");
 
   const hexRandomizer = () => {
     setTextContent("Press space to copy");
+    setShowColorAdded(false);
     let randomHex = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
     if (randomHex.length !== 7) {
       for (let i = randomHex.length; i < 7; i++) {
@@ -19,99 +22,107 @@ const App = () => {
   };
 
   const getTextColor = (hexCode) => {
+    setHexColor(hexCode);
+
     const rgb = parseInt(hexCode.substring(1), 16);
     const r = (rgb >> 16) & 0xff;
     const g = (rgb >> 8) & 0xff;
     const b = (rgb >> 0) & 0xff;
     const isDark = 0.2126 * r + 0.7152 * g + 0.0722 * b < 150;
 
-    if (isDark) {
-      setTextColor("isDark");
-      setHexColor(hexCode);
-    } else {
-      setTextColor("isLight");
-      setHexColor(hexCode);
-    }
+    setTextColor(isDark ? "dark" : "light");
   };
 
   document.addEventListener(
     "keydown",
-    function (event) {
+    (event) => {
       if (event.key === " " && hexColor !== "CLICK HERE") {
         navigator.clipboard.writeText(hexColor.toUpperCase());
-        setTextContent("Copied!");
+        setTextContent("Copied to clipboard!");
       }
     },
     { once: true }
   );
 
-  const addToColorPallet = () => {
-    var found = false;
+  const addColor = () => {
+    if (hexColor === "CLICK HERE" || colorPallete.length >= 7) return false;
+
     for (var i = 0; i < colorPallete.length; i++) {
       if (colorPallete[i].color === hexColor) {
-        found = true;
-        break;
+        return false;
       }
     }
-
-    if (hexColor === "CLICK HERE") {
-      return;
-    } else if (found) {
-      return;
-    } else if (colorPallete.length >= 10) {
-      return;
-    } else {
-      setColorPallete([...colorPallete, { color: hexColor, text: textColor }]);
-    }
+    
+    setColorPallete([...colorPallete, { color: hexColor, text: hexTextColor }]);
+    return true;
   };
 
   return (
     <div
-      className="App"
+      className="random-hex"
       style={{
-        backgroundColor: `${hexColor}`,
-        minHeight: "100vh",
-        overflow: "hidden",
+        backgroundColor: `${hexColor}`
       }}
     >
-      <h2 className={textColor}>RandomHex</h2>
-      <div className="git">
+      <h2 className={hexTextColor}>RandomHex</h2>
+      <div className="git-container">
         <a href="https://github.com/KevinCrespin">
-          <i className={`fab fa-github ${textColor}`}> </i>
+          <i className={`fab fa-github ${hexTextColor}`}/>
         </a>
       </div>
-      <div className="colorPallete">
-        {colorPallete.map((e, i) => (
+      <div className="show-container">
+        <i className={`fas fa-palette show-icon ${hexTextColor}`}
+          onClick={() => {
+            setShowColorPallete(!showColorPallete);
+          }}/>
+      </div>
+      <div className="color-pallete">
+        {showColorPallete && colorPallete.map((e, i) => (
           <div
             key={i}
             style={{
-              backgroundColor: "#FFF",
+              backgroundColor: `${hexTextColor === "dark" ? "#FFF" : "#000"}`,
             }}
-            className="colorDiv"
+            className="color-div"
           >
             <div
               style={{
-                color: `${e.text === "isDark" ? "#FFF" : "#000"}`,
+                color: `${e.text === "dark" ? "#FFF" : "#000"}`,
                 backgroundColor: `${e.color}`,
               }}
-              className="textDiv"
+              className="text-div"
+              onClick={(e) => console.log(e)}
             >
               {e.color.toUpperCase()}
             </div>
           </div>
         ))}
       </div>
-      <h1>
-        <a href="/#" className={textColor} onClick={hexRandomizer}>
+      <h1>  
+        <a href="/#" className={hexTextColor} onClick={hexRandomizer}>
           {hexColor}
         </a>
         <div className="add">
-          <a href="/#" onClick={addToColorPallet}>
-            <i className={`far fa-plus-square ${textColor}`}></i>
+          <a href="/#" onClick={() => {
+              const colorAdded = addColor();
+              if (colorAdded) {
+                setShowColorAdded(true);
+              }
+            }
+          }>
+            {!showColorAdded && hexColor !== "CLICK HERE" && colorPallete.length < 7
+            && 
+              <i className={`far fa-plus-square ${hexTextColor}`}></i>
+            }
+            {showColorAdded &&
+              <div className={`color-added ${hexTextColor}`}>
+                Color added to palette!
+              </div>
+            }
           </a>
         </div>
       </h1>
-      <h3 className={textColor}>{textContent}</h3>
+      <h3 className={hexTextColor}>{textContent}</h3>
     </div>
   );
 };
